@@ -1,0 +1,18 @@
+RewriteEngine On
+
+#Sirve para borrar la extencion de los archivos .php
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php
+
+#Sirve para borrar la extencion de los archivos .html
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html
+
+
+# Si la ruta no es un archivo existente, ni una carpeta
+# Reescribir al index
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+?)/?$ index.php?url=$1 [L,QSA]
