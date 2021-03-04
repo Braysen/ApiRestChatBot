@@ -63,7 +63,7 @@
 
         private function verifyEmail($email_user){
             //Crea la peticion para buscar el token
-            $query = "SELECT email_user FROM users where email_user='$email_user'";
+            $query = "SELECT mail FROM Users where mail='$email_user'";
             $resp = parent::nomQuery($query);//Ejecutamos la peticion
             if($resp>=1){//Si se realiza la peticion, enviamos la informacion
                 return $resp;
@@ -74,7 +74,7 @@
 
         private function obtenerDatosUsuarios($email, $password){
             //Crea la peticion para obtener los datos del usuario
-            $query = "select cod_user, password_user, email_user, status from users where email_user= '$email'";   
+            $query = "SELECT id, password, mail, status FROM Users WHERE mail= '$email'";   
             $data = parent::obtenerDatos($query);//Realiza la peticion
             if(isset($data['0']['cod_user'])){//Si, se realiza la peticion, enviamos la información
                 return $data;
@@ -85,9 +85,9 @@
 
         private function obtenerData($token){
             //Crea la peticion para obtener los datos del usuario
-            $query = "select cod_user,name_user, password_user ,lname_user, email_user, photo_user, phone_user, bname_user, bphone_user, bmail_user, status, token from users where token= '$token'";  
+            $query = "SELECT id,name, password ,lname, mail, photo, phone, bName, bPhone, bMail, userStatus, token FROM Users WHERE token= '$token'";  
             $data = parent::obtenerDatos($query);//Realiza la peticion
-            if(isset($data['0']['cod_user'])){//Si, se realiza la peticion, enviamos la información
+            if(isset($data['0']['id'])){//Si, se realiza la peticion, enviamos la información
                 return $data;
             }else{//Si, no se realiza la peticion enviamos un 0
                 return 0;
@@ -159,7 +159,7 @@
             $val = true;
             $token = bin2hex(openssl_random_pseudo_bytes(50,$val));//Genera el token de forma aleatoria
             $status = "active";//Definimos el estado del token
-            $query = "UPDATE users SET token = '$token', fecha='$date', stat_token='active', fechaexp_user = '$fecha_expiracion_token' WHERE email_user = '$email_user'";//Crea la peticion para actualizar el token
+            $query = "UPDATE Users SET token = '$token', tokenCreationDate='$date', tokenStatus='active', tokenExpirationDate = '$fecha_expiracion_token' WHERE mail = '$email_user'";//Crea la peticion para actualizar el token
             $verified= parent::nomQuery($query);//Ejecuta la peticion
             if($verified){//Si, se realiza la peticion, enviamos el token
                 return $token;
@@ -196,7 +196,7 @@
 
         private function searchToken(){
             //Crea la peticion para buscar el token
-            $query = "SELECT cod_user, name_user, email_user from users WHERE token = '$this->token' and stat_token='active' and cod_user='$this->cod_user'";
+            $query = "SELECT id, name, mail from Users WHERE token = '$this->token' and tokenStatus='active' and id='$this->cod_user'";
             //print_r($query);
             $resp = parent::obtenerDatos($query);//Ejecutamos la peticion
             if($resp){//Si se realiza la peticion, enviamos la informacion
@@ -208,7 +208,7 @@
 
         private function updateToken($cod_user){
             $date = date("Y-m-d");
-            $query = "UPDATE users SET fecha='$date', token='', stat_token='inactive' WHERE cod_user='$cod_user'";
+            $query = "UPDATE Users SET tokenCreationDate='$date', token='', tokenStatus='inactive' WHERE id='$cod_user'";
             $resp = parent::nomQuery($query);
             if($resp >=1){
                 return $resp;
