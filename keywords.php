@@ -24,18 +24,33 @@ require_once 'clases/keywords.class.php';
     }else if($_SERVER['REQUEST_METHOD'] == 'POST'){
         //Obtenemos los datos del frontend
         $post_body = file_get_contents("php://input");
-        //Enviamos los datos al manejador
-        $data = $_keywords->post($post_body);
-        //Devolvemos una respuesta
-        header('Content-type: application/json');
-        if(isset($data['result']['error_id'])){
-            $responseCode = $data['result']['error_id'];
-            http_response_code($responseCode);
+        $datos = json_decode($post_body,true);
+        if(isset($datos['keyword'])){
+            $data = $_keywords->post($post_body);
+            //Devolvemos una respuesta
+            header('Content-type: application/json');
+            if(isset($data['result']['error_id'])){
+                $responseCode = $data['result']['error_id'];
+                http_response_code($responseCode);
+            }else{
+                http_response_code(200);
+            }
+            //Mostramos la informacion en formato JSON
+            echo json_encode($data);
         }else{
-            http_response_code(200);
+            $data = $_keywords->keywordByType($post_body);
+            //Devolvemos una respuesta
+            header('Content-type: application/json');
+            if(isset($data['result']['error_id'])){
+                $responseCode = $data['result']['error_id'];
+                http_response_code($responseCode);
+            }else{
+                http_response_code(200);
+            }
+            //Mostramos la informacion en formato JSON
+            echo json_encode($data);
         }
-        //Mostramos la informacion en formato JSON
-        echo json_encode($data);
+        
     }else if($_SERVER['REQUEST_METHOD'] == 'PUT'){
         //Obtenemos los datos del front-end
         $post_body = file_get_contents("php://input");

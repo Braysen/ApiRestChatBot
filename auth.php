@@ -6,24 +6,29 @@ require_once('clases/answers.php');
     $_answers = new answers;
     //Si la peticion es POST
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
-        //recibir los datos
-        $post_body = file_get_contents("php://input");
-        //Enviamos los datos al manejador
-        $data = $_auth->login($post_body);
-        //Devolvemos una respuesta
-        header('Content-type: application/json');
-        //Si, existe algun error en la petición
-        if(isset($data['result']['error_id'])){
-            //Obtenemos el codigo del error
-            $responseCode = $data['result']['error_id'];
-            //Enviamos el codigo del error http
-            http_response_code($responseCode);
+        $post_body = file_get_contents("php://input");//recibir los datos
+        $datos = json_decode($post_body,true);
+        if(isset($datos['password'])){
+            $data = $_auth->login($post_body);//Enviamos los datos al manejador
+            header('Content-type: application/json');//Devolvemos una respuesta
+            if(isset($data['result']['error_id'])){//Si, existe algun error en la petición
+                $responseCode = $data['result']['error_id'];//Obtenemos el codigo del error
+                http_response_code($responseCode);//Enviamos el codigo del error http
+            }else{
+                http_response_code(200);//Enviamos el codigo http 200
+            }
+            echo json_encode($data);//Muestra el mensaje en formato JSON
         }else{
-            //Enviamos el codigo http 200
-            http_response_code(200);
+            $data = $_auth->logout($post_body);//Enviamos los datos al manejador
+            header('Content-type: application/json');//Devolvemos una respuesta
+            if(isset($data['result']['error_id'])){//Si, existe algun error en la petición
+                $responseCode = $data['result']['error_id'];//Obtenemos el codigo del error
+                http_response_code($responseCode);//Enviamos el codigo del error http
+            }else{
+                http_response_code(200);//Enviamos el codigo http 200
+            }
+            echo json_encode($data);//Muestra el mensaje en formato JSON
         }
-        //Muestra el mensaje en formato JSON
-        echo json_encode($data);
     }else{//Si, la peticion no es POST
         //Devolvemos una respuesta
         header('Content-type: application/json');

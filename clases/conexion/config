@@ -2,8 +2,9 @@
     "conexion":{
         "server" : "localhost",
         "user" : "root",
-        "password" : "",
-        "database" : "chatbot",
+        "password" : "Start123!",
+        "database" : "Ivan",
         "port": "3306"
     }
 }
+
