@@ -55,7 +55,8 @@ class conexion {
             $resultArray[] = $key;
         }
         //Retorna los valores en UTF8
-        return $this->convertirUTF8($resultArray);
+        return $resultArray;
+        //$this->convertirUTF8($resultArray);
     }
     //Funcion que sirve para realizar una consulta en la base de datos
     public function nomQuery($sqlstr){

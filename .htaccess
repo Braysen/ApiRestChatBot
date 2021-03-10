@@ -1,3 +1,4 @@
+#Options +FollowSymLinks
 RewriteEngine On
 
 #Sirve para borrar la extencion de los archivos .php

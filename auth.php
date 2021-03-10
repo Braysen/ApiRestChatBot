@@ -8,16 +8,51 @@ require_once('clases/answers.php');
     if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $post_body = file_get_contents("php://input");//recibir los datos
         $datos = json_decode($post_body,true);
-        if(isset($datos['password'])){
-            $data = $_auth->login($post_body);//Enviamos los datos al manejador
-            header('Content-type: application/json');//Devolvemos una respuesta
-            if(isset($data['result']['error_id'])){//Si, existe algun error en la petición
-                $responseCode = $data['result']['error_id'];//Obtenemos el codigo del error
-                http_response_code($responseCode);//Enviamos el codigo del error http
-            }else{
-                http_response_code(200);//Enviamos el codigo http 200
+        if(isset($datos['pass'])){
+            if(isset($datos['name'])){//Create user
+                $data = $_auth->createUser($post_body);//Enviamos los datos al manejador
+                header('Content-type: application/json');//Devolvemos una respuesta
+                if(isset($data['result']['error_id'])){//Si, existe algun error en la petición
+                    $responseCode = $data['result']['error_id'];//Obtenemos el codigo del error
+                    http_response_code($responseCode);//Enviamos el codigo del error http
+                }else{
+                    http_response_code(200);//Enviamos el codigo http 200
+                }
+                echo json_encode($data);//Muestra el mensaje en formato JSON
             }
-            echo json_encode($data);//Muestra el mensaje en formato JSON
+            
+            /*else if(isset($datos['photo'])){
+                $data = $_auth->updateProfile($post_body);//Enviamos los datos al manejador
+                header('Content-type: application/json');//Devolvemos una respuesta
+                if(isset($data['result']['error_id'])){//Si, existe algun error en la petición
+                    $responseCode = $data['result']['error_id'];//Obtenemos el codigo del error
+                    http_response_code($responseCode);//Enviamos el codigo del error http
+                }else{
+                    http_response_code(200);//Enviamos el codigo http 200
+                }
+                echo json_encode($data);//Muestra el mensaje en formato JSON
+            }*/
+            else{//Login
+                $data = $_auth->login($post_body);//Enviamos los datos al manejador
+                header('Content-type: application/json');//Devolvemos una respuesta
+                if(isset($data['result']['error_id'])){//Si, existe algun error en la petición
+                    $responseCode = $data['result']['error_id'];//Obtenemos el codigo del error
+                    http_response_code($responseCode);//Enviamos el codigo del error http
+                }else{
+                    http_response_code(200);//Enviamos el codigo http 200
+                }
+                echo json_encode($data);//Muestra el mensaje en formato JSON
+            }
+        }else if(isset($datos['id'])){
+            $data = $_auth->updateProfile($post_body);//Enviamos los datos al manejador
+                header('Content-type: application/json');//Devolvemos una respuesta
+                if(isset($data['result']['error_id'])){//Si, existe algun error en la petición
+                    $responseCode = $data['result']['error_id'];//Obtenemos el codigo del error
+                    http_response_code($responseCode);//Enviamos el codigo del error http
+                }else{
+                    http_response_code(200);//Enviamos el codigo http 200
+                }
+                echo json_encode($data);//Muestra el mensaje en formato JSON
         }else{
             $data = $_auth->logout($post_body);//Enviamos los datos al manejador
             header('Content-type: application/json');//Devolvemos una respuesta
