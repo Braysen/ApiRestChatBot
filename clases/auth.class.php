@@ -121,51 +121,110 @@
             }
         }
 
-        public function updateProfile($json){
+        public function updateProfile($json){//name y phone
             $_answers = new answers;
             $datos = json_decode($json,true);
-            if(!isset($datos["id"]) || !isset($datos["phone"]) || !isset($datos["bName"]) || !isset($datos["bPhone"]) || !isset($datos["bMail"]) || !isset($datos["bAddress"]) || !isset($datos["bPhoto"]) || !isset($datos["type"]) || !isset($datos["token"])){//Si, los campos no existen
+            if(!isset($datos["id"]) || !isset($datos["phone"]) || !isset($datos["token"]) || !isset($datos["name"])){//Si, los campos no existen
                 return $_answers->error_401();//error con los campos
             }else{
-                if($datos["token"] == ""){//si, el campo token esta vacio
-                    return $_answers->error_401();//error con los campos              
-                }else{//Si el campo token tiene data
-                    if($datos["id"] == ""){//Si el campo id no tiene dato
+                if($datos["id"] == "" || $datos["token"] == ""){//Si, los campos estan vacios
+                    if($datos["id"] == ""){
                         return $_answers->error_211("The id field is required !");
-                    }else{//Si, el campo id tiene dato
-                        $this->cod_user = $datos["id"];
-                        $this->token = $datos["token"];
-                        $resp_token_search = $this->searchToken();
-                        if($resp_token_search == 0){//Si, el token no pertenece al usuario
-                            return $_answers->error_212("The token is invalid or has expired !");
-                        }else{//Si el token pertenece al usuario
-                            $this->phone = $datos["phone"];
-                            $this->bName = $datos["bName"];
-                            $this->bPhone = $datos["bPhone"];
-                            $this->bMail = $datos["bMail"];
-                            $this->bAddress = $datos["bAddress"];
-                            $this->bPhoto = $datos["bPhoto"];
-                            $this->type = $datos["type"];
-                            $resp_update_user = $this->update($datos["id"]);
-                            if($resp_update_user == 0){//Si no hizo ningun cambio en su perfil
-                                $resp_datas1 = $this->obtenerDataCreate($datos["id"]);
-                                if($resp_datas1){
-                                    $data_update_user = $this->convertData($resp_datas1);
-                                    if($data_update_user){
-                                        return $data_update_user;
+                    }else if($datos["token"] == ""){
+                        return $_answers->error_213("The token field is required !");
+                    }else if($datos["token"] == "" && $datos["id"] == ""){
+                        return $_answers->error_400();//Mostramos un mensaje de alerta, indicandole al usuario que los campos son requeridos*/
+                    }
+                }else{//Si los campos tienen data
+                    $this->cod_user = $datos["id"];
+                    $this->token = $datos["token"];
+                    $resp_verified_token = $this->searchToken();
+                    if($resp_verified_token == 0){//Si, el token es invalido o no le pertenece al usuario que inicio sesion
+                        return $_answers->error_212("The token is invalid or expired !");
+                    }else{
+                        if($datos["phone"] != "" || $datos["name"] != ""){
+                            //$phone_tamaño = strlen($datos["phone"]);
+                            if($datos["phone"] != ""){//Si el campo phone esta con datos
+                                if(is_numeric($datos["phone"])){//Si, el campo phone solo tiene numeros
+                                    $phone_tamaño = strlen($datos["phone"]);
+                                    if($phone_tamaño == 9){//Si el campo phone contiene nueve digitos
+                                        $this->phone = $datos["phone"];
+                                        $this->name = $datos["name"];
+                                        $resp_update_profile = $this->update($this->cod_user);
+                                        if($resp_update_profile == 1){//Si, el usuario hizo alguna modificacion es su perfil
+                                            $resp_data_create = $this->obtenerDataCreate($datos["id"]);
+                                            if($resp_data_create == 0){
+                                                $data_convertida = $this->convertData($resp_data_create);
+                                                if($data_convertida){
+                                                    return $data_convertida;
+                                                }
+                                                //return $resp_data_create;
+                                            }else{
+                                                $data_convertida = $this->convertData($resp_data_create);
+                                                if($data_convertida){
+                                                    return $data_convertida;
+                                                }
+                                                //return $resp_data_create;
+                                            }
+                                        }else{//Si, el usuario no hizo modificaciones en su perfil
+                                            //return $resp_update_profile;
+                                            $resp_data_create = $this->obtenerDataCreate($datos["id"]);
+                                            if($resp_data_create == 0){
+                                                $data_convertida = $this->convertData($resp_data_create);
+                                                if($data_convertida){
+                                                    return $data_convertida;
+                                                }
+                                                //return $resp_data_create;
+                                            }else{
+                                                $data_convertida = $this->convertData($resp_data_create);
+                                                if($data_convertida){
+                                                    return $data_convertida;
+                                                }
+                                                //return $resp_data_create;
+                                            }
+                                        }
+                                    }else{//Si, el campo phone no tiene 9 digitos
+                                        return $_answers->error_221("The phone field must contain 9 digits");
                                     }
-                                }else{
-                                    return $_answers->error_500("Internal error. we could not save your request !");//Mostramos un mensaje de alerta, indicando que hubo un error por parte del servidor
+                                }else{//Si, el campo phone tiene letras
+                                    return $_answers->error_220("The phone field only accepts numbers !");
                                 }
-                            }else{//Si realizo algun cambio en su perfil
-                                $resp_datas2 = $this->obtenerDataCreate($datos["id"]);
-                                if($resp_datas2){
-                                    $data_update_user = $this->convertData($resp_datas2);
-                                    if($data_update_user){
-                                        return $data_update_user;
+                            }else{//Si, el campo phone esta vacio
+                                $this->phone = $datos["phone"];
+                                $this->name = $datos["name"];
+                                $resp_update_profile = $this->update($this->cod_user);
+                                if($resp_update_profile == 1){//Si, el usuario hizo modificaciones en su perfil
+                                    $resp_data_create = $this->obtenerDataCreate($datos["id"]);
+                                    if($resp_data_create == 0){
+                                        //return $resp_data_create;
+                                        $data_convertida = $this->convertData($resp_data_create);
+                                        if($data_convertida){
+                                            return $data_convertida;
+                                        }
+
+                                    }else{
+                                        //print_r($resp_data_create);
+                                        $data_convertida = $this->convertData($resp_data_create);
+                                        if($data_convertida){
+                                            return $data_convertida;
+                                        }
+                                    }   
+                                }else{//Si, el usuario no hizo modificaciones en su perfil
+                                    //return $resp_update_profile;
+                                    $resp_data_create = $this->obtenerDataCreate($datos["id"]);
+                                    if($resp_data_create == 0){
+                                        //print_r($resp_data_create);
+                                        $data_convertida = $this->convertData($resp_data_create);
+                                        if($data_convertida){
+                                            return $data_convertida;
+                                        }
+                                    }else{
+                                        //print_r($resp_data_create);
+                                        $data_convertida = $this->convertData($resp_data_create);
+                                        if($data_convertida){
+                                            return $data_convertida;
+                                        }
                                     }
-                                }else{
-                                    return $_answers->error_500("Internal error. we could not save your request !");//Mostramos un mensaje de alerta, indicando que hubo un error por parte del servidor
                                 }
                             }
                         }
@@ -176,7 +235,7 @@
         }
 
         private function update($id){
-            $query = "UPDATE Users SET phone='$this->phone', bName='$this->bName', bPhone='$this->bPhone', bMail = '$this->bMail', bAddress = '$this->bAddress', bPhoto = '$this->bPhoto', type = '$this->type' WHERE id='$id'";
+            $query = "UPDATE Users SET phone='$this->phone', name='$this->name' WHERE id='$id'";
             $resp = parent::nomQuery($query);
             if($resp >=1){
                 return $resp;
@@ -384,9 +443,16 @@
         }
 
         private function postUser(){
+            $date = date("Y-m-d");//Genera la fecha y la hora, en la que se genera el token
+            $fecha = date_create($date);
+            date_add($fecha, date_interval_create_from_date_string("1 month"));
+            $fecha_expiracion_token = date_format($fecha,"Y-m-d");
+
             $pass_encrypt = password_hash($this->password, PASSWORD_DEFAULT);
+            $val = true;
+            $token_generate = bin2hex(openssl_random_pseudo_bytes(50,$val));
             //Crea la peticion para crear una cuenta
-            $query = "INSERT INTO Users (name, lname, mail, password, userStatus) values ('$this->name', '$this->lname', '$this->mail', '$pass_encrypt', 'active')";
+            $query = "INSERT INTO Users (name, lname, mail, password, userStatus, token, tokenStatus, tokenCreationDate, tokenExpirationDate) values ('$this->name', '$this->lname', '$this->mail', '$pass_encrypt', 'active', '$token_generate', 'active', '$date', '$fecha_expiracion_token')";
             $resp = parent::nomQueryId($query);//Ejecuta la peticion 
             if($resp){//Si se realiza la peticion, enviamos la informacion
                 return $resp;

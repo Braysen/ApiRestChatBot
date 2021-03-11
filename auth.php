@@ -19,20 +19,7 @@ require_once('clases/answers.php');
                     http_response_code(200);//Enviamos el codigo http 200
                 }
                 echo json_encode($data);//Muestra el mensaje en formato JSON
-            }
-            
-            /*else if(isset($datos['photo'])){
-                $data = $_auth->updateProfile($post_body);//Enviamos los datos al manejador
-                header('Content-type: application/json');//Devolvemos una respuesta
-                if(isset($data['result']['error_id'])){//Si, existe algun error en la petición
-                    $responseCode = $data['result']['error_id'];//Obtenemos el codigo del error
-                    http_response_code($responseCode);//Enviamos el codigo del error http
-                }else{
-                    http_response_code(200);//Enviamos el codigo http 200
-                }
-                echo json_encode($data);//Muestra el mensaje en formato JSON
-            }*/
-            else{//Login
+            }else{//Login
                 $data = $_auth->login($post_body);//Enviamos los datos al manejador
                 header('Content-type: application/json');//Devolvemos una respuesta
                 if(isset($data['result']['error_id'])){//Si, existe algun error en la petición
