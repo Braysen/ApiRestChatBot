@@ -2,7 +2,7 @@
     require_once('conexion/conexion.php');
     require_once('answers.php');
 
-    class auth extends conexion{
+    class setting extends conexion{
         private $idUsuario = "";
         private $latePayments = "";
         private $newMaintenance = "";
